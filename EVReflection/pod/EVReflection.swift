@@ -762,7 +762,9 @@ final public class EVReflection {
                     value = propertyGetter()
                 }
                 var (unboxedValue, valueType): (AnyObject, String) = valueForAny(theObject, key: key, anyValue: value)
-                if unboxedValue as? EVObject != nil {
+                if unboxedValue is NSNull {
+                    propertiesDictionary.removeObjectForKey(key)
+                } else if unboxedValue as? EVObject != nil {
                     let (dict, _) = toDictionary(unboxedValue as! NSObject, performKeyCleanup: false)
                     propertiesDictionary.setValue(dict, forKey: key)
                 } else if let array = unboxedValue as? [EVObject] {
@@ -776,8 +778,9 @@ final public class EVReflection {
                 } else {
                     propertiesDictionary.setValue(unboxedValue, forKey: key)
                 }
-                
-                propertiesTypeDictionary[key] = valueType
+                if !(unboxedValue is NSNull) {
+                    propertiesTypeDictionary[key] = valueType
+                }
             }
             
         }
